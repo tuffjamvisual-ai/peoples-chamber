@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mp-profile">
+    <div class="mp-profile-header">
+        <img src="{{ mp.sponsor_photo }}" alt="{{ mp.sponsor_name }}">
+        <div class="mp-profile-info">
+            <h1>{{ mp.sponsor_name }}</h1>
+            <span class="party-badge" style="background-color: {{ mp.sponsor_party_colour }}">{{ mp.sponsor_party }}</span>
+            <p class="constituency">📍 {{ mp.sponsor_constituency }}</p>
+            <p class="bill-count">{{ bills|length }} bill{{ 's' if bills|length != 1 else '' }} sponsored</p>
+            {% if mp.sponsor_page %}
+            <a href="{{ mp.sponsor_page }}" target="_blank" class="btn">View Parliament Profile →</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="mp-stats">
+        <div class="stat-box">
+            <span class="stat-number">{{ bills|length }}</span>
+            <span class="stat-label">Bills Sponsored</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number support">{{ yes_votes }}</span>
+            <span class="stat-label">Public Support Votes</span>
+        </div>
+        <div class="stat-box">
+            <span class="stat-number oppose">{{ no_votes }}</span>
+            <span class="stat-label">Public Oppose Votes</span>
+        </div>
+    </div>
+    <h2>Sponsored Bills</h2>
+    <div class="bills-grid">
+        {% for bill in bills %}
+        {% set total = bill.votes|length %}
+        {% set yes_count = bill.votes|selectattr('choice','equalto','yes')|list|length %}
+        {% set no_count = bill.votes|selectattr('choice','equalto','no')|list|length %}
+        {% if total > 0 %}
+            {% set yes_pct = ((yes_count / total) * 100)|round(1) %}
+            {% set no_pct = ((no_count / total) * 100)|round(1) %}
+        {% else %}
+            {% set yes_pct = 0 %}
+            {% set no_pct = 0 %}
+        {% endif %}
+        <div class="bill-card">
+            <span class="category">{{ bill.category }}</span>
+            <h2>{{ bill.title }}</h2>
+            <div class="card-bars">
+                <div class="card-bar-row">
+                    <span class="card-bar-label support">Support</span>
+                    <div class="bar-track">
+                        <div class="bar-fill support" style="width: {{ yes_pct }}%"></div>
+                    </div>
+                    <span class="card-bar-pct">{{ yes_pct }}%</span>
+                </div>
+                <div class="card-bar-row">
+                    <span class="card-bar-label oppose">Oppose</span>
+                    <div class="bar-track">
+                        <div class="bar-fill oppose" style="width: {{ no_pct }}%"></div>
+                    </div>
+                    <span class="card-bar-pct">{{ no_pct }}%</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <span class="total-votes">{{ total }} votes</span>
+                <a href="{{ url_for('bill', bill_id=bill.id) }}" class="btn">View & Vote</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

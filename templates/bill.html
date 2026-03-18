@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bill-detail">
+    <!-- MP Sponsor Section -->
+    {% if bill.sponsor_name %}
+    <div class="sponsor-section">
+        <div class="sponsor-header">
+            <div class="sponsor-photo-large">
+                {% if bill.sponsor_photo %}
+                    <img src="{{ bill.sponsor_photo }}" alt="{{ bill.sponsor_name }}" onerror="this.src='/static/default-mp.png'">
+                {% else %}
+                    <div class="photo-placeholder-large">{{ bill.sponsor_name[:2] }}</div>
+                {% endif %}
+            </div>
+            <div class="sponsor-info-large">
+                <h3>Sponsored by</h3>
+                <div class="sponsor-name-large">{{ bill.sponsor_name }}</div>
+                {% if bill.sponsor_party %}
+                    <div class="party-badge-large" style="background-color: {{ bill.sponsor_party_colour or '#666' }}">{{ bill.sponsor_party }}</div>
+                {% endif %}
+                {% if bill.sponsor_constituency %}
+                    <div class="constituency-large">{{ bill.sponsor_constituency }}</div>
+                {% endif %}
+                {% if bill.sponsor_page %}
+                    <a href="{{ bill.sponsor_page }}" class="sponsor-link" target="_blank">View MP Profile →</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Bill Stage Progress -->
+    {% if bill.current_stage %}
+    <div class="stage-section">
+        <h3>Legislative Progress</h3>
+        <div class="stage-progress-large">
+            <div class="stage-tracker-large">
+                {% set all_stages = [
+                    {'name': '1st Reading', 'key': '1st reading'},
+                    {'name': 'Commons', 'key': '2nd reading'},
+                    {'name': 'Lords', 'key': 'lords'},
+                    {'name': 'Ping-pong', 'key': 'consideration'},
+                    {'name': 'Royal Assent', 'key': 'royal assent'}
+                ] %}
+                
+                {% for stage in all_stages %}
+                    {% set is_active = stage.key in (bill.current_stage or '').lower() %}
+                    {% set is_completed = loop.index <= 2 %}
+                    
+                    <div class="stage-item {% if is_active %}active{% elif is_completed %}completed{% endif %}">
+                        <div class="stage-dot-large"></div>
+                        <div class="stage-name">{{ stage.name }}</div>
+                    </div>
+                    
+                    {% if not loop.last %}
+                        <div class="stage-connector {% if is_completed %}completed{% endif %}"></div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="current-stage-info">
+                <strong>Current Stage:</strong> {{ bill.current_stage }}
+                {% if bill.stage_date %}
+                    <span class="stage-date">({{ bill.stage_date }})</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Bill Details -->
+    <div class="bill-content">
+        <span class="category">{{ bill.category }}</span>
+        {% if bill.originating_house %}
+            <span class="house-badge">{{ bill.originating_house }}</span>
+        {% endif %}
+        
+        <h1>{{ bill.title }}</h1>
+        
+        {% if bill.long_title and bill.long_title != bill.title %}
+            <div class="long-title">{{ bill.long_title }}</div>
+        {% endif %}
+        
+        <p>{{ bill.description }}</p>
+        
+        {% if bill.is_defeated %}
+            <div class="status-alert defeated">⚠️ This bill has been defeated</div>
+        {% elif bill.bill_withdrawn %}
+            <div class="status-alert withdrawn">⚠️ This bill has been withdrawn</div>
+        {% endif %}
+    </div>
+    
+    <!-- Vote Statistics -->
+    <div class="vote-stats">
+        <h3>Public Opinion</h3>
+        {% set total = yes + no + abstain %}
+        {% if total > 0 %}
+            {% set yes_pct = ((yes / total) * 100)|round(1) %}
+            {% set no_pct = ((no / total) * 100)|round(1) %}
+            {% set abstain_pct = ((abstain / total) * 100)|round(1) %}
+        {% else %}
+            {% set yes_pct = 0 %}
+            {% set no_pct = 0 %}
+            {% set abstain_pct = 0 %}
+        {% endif %}
+        
+        <div class="vote-bar-row">
+            <span class="vote-label support">Support</span>
+            <div class="bar-track">
+                <div class="bar-fill support" style="width: {{ yes_pct }}%"></div>
+            </div>
+            <span class="vote-count">{{ yes }} ({{ yes_pct }}%)</span>
+        </div>
+        
+        <div class="vote-bar-row">
+            <span class="vote-label oppose">Oppose</span>
+            <div class="bar-track">
+                <div class="bar-fill oppose" style="width: {{ no_pct }}%"></div>
+            </div>
+            <span class="vote-count">{{ no }} ({{ no_pct }}%)</span>
+        </div>
+        
+        <div class="vote-bar-row">
+            <span class="vote-label abstain">Abstain</span>
+            <div class="bar-track">
+                <div class="bar-fill abstain" style="width: {{ abstain_pct }}%"></div>
+            </div>
+            <span class="vote-count">{{ abstain }} ({{ abstain_pct }}%)</span>
+        </div>
+        
+        <div class="total-votes-large">Total: {{ total }} votes</div>
+    </div>
+    
+    <!-- Voting Buttons -->
+    {% if current_user.is_authenticated %}
+        <div class="vote-section">
+            <h3>Cast Your Vote</h3>
+            {% if user_vote %}
+                <p class="current-vote">Your current vote: <strong>{{ user_vote.choice.title() }}</strong></p>
+            {% endif %}
+            
+            <div class="vote-buttons">
+                <form method="POST" action="{{ url_for('vote', bill_id=bill.id, choice='yes') }}" style="flex: 1;">
+                    <button type="submit" class="btn btn-yes {% if user_vote and user_vote.choice == 'yes' %}active{% endif %}">
+                        👍 Support
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('vote', bill_id=bill.id, choice='no') }}" style="flex: 1;">
+                    <button type="submit" class="btn btn-no {% if user_vote and user_vote.choice == 'no' %}active{% endif %}">
+                        👎 Oppose
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('vote', bill_id=bill.id, choice='abstain') }}" style="flex: 1;">
+                    <button type="submit" class="btn btn-abstain {% if user_vote and user_vote.choice == 'abstain' %}active{% endif %}">
+                        ⚪ Abstain
+                    </button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <div class="login-prompt">
+            <h3>Want to vote on this bill?</h3>
+            <p>Register or log in to make your voice heard.</p>
+            <div class="login-buttons">
+                <a href="{{ url_for('register') }}" class="btn">Register</a>
+                <a href="{{ url_for('login') }}" class="btn btn-secondary">Login</a>
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="back-link">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary">← Back to Bills</a>
+    </div>
+</div>
+{% endblock %}

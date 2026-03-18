@@ -1,0 +1,673 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0a0e1a;
+    color: #e0e6f0;
+    min-height: 100vh;
+}
+
+nav {
+    background: #111827;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #1e3a5f;
+}
+
+.nav-brand {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #4a9eff;
+}
+
+.nav-links a {
+    color: #e0e6f0;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    transition: all 0.2s;
+}
+
+.nav-links a:hover {
+    color: #4a9eff;
+    background: rgba(74, 158, 255, 0.1);
+}
+
+.nav-links a.active {
+    color: #4a9eff;
+    background: rgba(74, 158, 255, 0.2);
+}
+
+.container {
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+}
+
+.flash {
+    background: #1e3a5f;
+    border-left: 4px solid #4a9eff;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+}
+
+.hero {
+    text-align: center;
+    padding: 3rem 0 2rem;
+}
+
+.hero h1 {
+    font-size: 2.5rem;
+    color: #4a9eff;
+    margin-bottom: 0.5rem;
+}
+
+.hero p {
+    font-size: 1.1rem;
+    color: #8899aa;
+}
+
+/* Search and Filters */
+.search-filters {
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.search-bar input {
+    flex: 1;
+    padding: 0.75rem;
+    background: #0a0e1a;
+    border: 1px solid #1e3a5f;
+    border-radius: 5px;
+    color: #e0e6f0;
+    font-size: 1rem;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #4a9eff;
+}
+
+.btn-search {
+    background: #4a9eff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.filter-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.filter-row select {
+    padding: 0.6rem;
+    background: #0a0e1a;
+    border: 1px solid #1e3a5f;
+    border-radius: 5px;
+    color: #e0e6f0;
+    min-width: 150px;
+}
+
+.btn-filter {
+    background: #4a9eff;
+}
+
+.btn-clear {
+    background: #666;
+}
+
+.bills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.bill-card {
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.bill-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.1);
+}
+
+/* MP Sponsor Info */
+.sponsor-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #1e3a5f;
+}
+
+.sponsor-photo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.sponsor-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: #4a9eff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.sponsor-details {
+    flex: 1;
+}
+
+.sponsor-name {
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+}
+
+.party-badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.constituency {
+    font-size: 0.85rem;
+    color: #8899aa;
+}
+
+/* Stage Progress */
+.stage-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.stage-tracker {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.stage-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #1e3a5f;
+    transition: all 0.2s;
+}
+
+.stage-dot.active {
+    background: #4a9eff;
+    box-shadow: 0 0 8px rgba(74, 158, 255, 0.4);
+}
+
+.current-stage {
+    font-size: 0.85rem;
+    color: #4a9eff;
+    font-weight: 500;
+}
+
+.category {
+    background: #1e3a5f;
+    color: #4a9eff;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    display: inline-block;
+}
+
+.bill-card h2 {
+    font-size: 1.1rem;
+    color: #ffffff;
+    line-height: 1.4;
+}
+
+.card-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.card-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.card-bar-label {
+    width: 60px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.card-bar-label.support {
+    color: #4caf82;
+}
+
+.card-bar-label.oppose {
+    color: #cf6679;
+}
+
+.bar-track {
+    flex: 1;
+    background: #1e2a3a;
+    border-radius: 20px;
+    height: 8px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.bar-fill.support {
+    background: #4caf82;
+}
+
+.bar-fill.oppose {
+    background: #cf6679;
+}
+
+.card-bar-pct {
+    width: 40px;
+    font-size: 0.8rem;
+    color: #8899aa;
+    text-align: right;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.total-votes {
+    color: #8899aa;
+    font-size: 0.85rem;
+}
+
+.btn {
+    background: #4a9eff;
+    color: #ffffff;
+    border: none;
+    padding: 0.6rem 1.4rem;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size: 0.95rem;
+    display: inline-block;
+    transition: background 0.2s;
+}
+
+.btn:hover {
+    background: #2a7edd;
+}
+
+.btn-yes {
+    background: #1a7a4a;
+}
+
+.btn-yes:hover {
+    background: #145e38;
+}
+
+.btn-no {
+    background: #7a1a1a;
+}
+
+.btn-no:hover {
+    background: #5e1414;
+}
+
+.btn-abstain {
+    background: #4a4a4a;
+}
+
+.btn-abstain:hover {
+    background: #333333;
+}
+
+/* Bill Detail Page */
+.bill-detail {
+    max-width: 750px;
+    margin: 0 auto;
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    padding: 2rem;
+}
+
+.bill-detail h1 {
+    font-size: 1.8rem;
+    margin: 1rem 0;
+    color: #ffffff;
+}
+
+.bill-detail p {
+    color: #8899aa;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.vote-stats {
+    margin: 1.5rem 0;
+}
+
+.vote-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.8rem;
+}
+
+.vote-label {
+    width: 70px;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.vote-label.support {
+    color: #4caf82;
+}
+
+.vote-label.oppose {
+    color: #cf6679;
+}
+
+.vote-label.abstain {
+    color: #888888;
+}
+
+.vote-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.vote-buttons .btn {
+    flex: 1;
+    text-align: center;
+}
+
+/* About Page */
+.page-header {
+    text-align: center;
+    padding: 2rem 0;
+    border-bottom: 1px solid #1e3a5f;
+    margin-bottom: 3rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    color: #4a9eff;
+    margin-bottom: 0.5rem;
+}
+
+.page-header p {
+    font-size: 1.1rem;
+    color: #8899aa;
+}
+
+.about-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-section {
+    margin-bottom: 3rem;
+}
+
+.about-section h2 {
+    color: #4a9eff;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.about-section p {
+    color: #8899aa;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.step {
+    text-align: center;
+    padding: 1.5rem;
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: #4a9eff;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin: 0 auto 1rem;
+}
+
+.step h3 {
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.step p {
+    color: #8899aa;
+    font-size: 0.9rem;
+}
+
+/* Placeholder content */
+.placeholder-content {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+}
+
+.placeholder-content h3 {
+    color: #4a9eff;
+    margin-bottom: 1rem;
+}
+
+.placeholder-content p {
+    color: #8899aa;
+}
+
+.no-bills {
+    text-align: center;
+    color: #8899aa;
+    font-style: italic;
+    padding: 2rem;
+    grid-column: 1 / -1;
+}
+.mps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.mp-card {
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    padding-bottom: 1rem;
+}
+
+.mp-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.mp-info {
+    padding: 1rem;
+}
+
+.mp-info h3 {
+    font-size: 1rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.party-badge {
+    display: inline-block;
+    padding: 0.2rem 0.7rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    color: #ffffff;
+    margin-bottom: 0.5rem;
+}
+
+.constituency {
+    color: #8899aa;
+    font-size: 0.85rem;
+    margin-bottom: 0.3rem;
+}
+
+.bill-count {
+    color: #4a9eff;
+    font-size: 0.85rem;
+    margin-bottom: 0.8rem;
+}
+
+.mp-profile {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.mp-profile-header {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.mp-profile-header img {
+    width: 200px;
+    height: 240px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.mp-profile-info h1 {
+    font-size: 2rem;
+    color: #ffffff;
+    margin-bottom: 0.8rem;
+}
+
+.mp-profile-info .constituency {
+    color: #8899aa;
+    margin: 0.5rem 0;
+    font-size: 1rem;
+}
+
+.mp-profile-info .bill-count {
+    color: #4a9eff;
+    margin: 0.5rem 0 1rem;
+    font-size: 1rem;
+}
+
+.mp-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-box {
+    flex: 1;
+    background: #111827;
+    border: 1px solid #1e3a5f;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-number {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #4a9eff;
+    margin-bottom: 0.5rem;
+}
+
+.stat-number.support { color: #4caf82; }
+.stat-number.oppose { color: #cf6679; }
+
+.stat-label {
+    color: #8899aa;
+    font-size: 0.9rem;
+}
+
+.mp-profile h2 {
+    color: #4a9eff;
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+}

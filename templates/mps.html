@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="hero">
+    <h1>Members of Parliament</h1>
+    <p>MPs who have sponsored bills in the Peoples Chamber.</p>
+</div>
+<div class="mps-grid">
+    {% if mps %}
+        {% for mp in mps %}
+        <div class="mp-card">
+            <img src="{{ mp.photo }}" alt="{{ mp.name }}" onerror="this.style.display='none'">
+            <div class="mp-info">
+                <h3>{{ mp.name }}</h3>
+                <span class="party-badge" style="background-color: {{ mp.colour }}">{{ mp.party }}</span>
+                <p class="constituency">{{ mp.constituency }}</p>
+                <p class="bill-count">{{ mp.bill_count }} bill{{ 's' if mp.bill_count != 1 else '' }}</p>
+                <a href="/mp/{{ mp.name }}" class="btn">View Profile</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p class="no-bills">No MP data available yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

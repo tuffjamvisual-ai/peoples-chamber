@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+instance/
+*.log
+*.db
+.env
+bridge.py
+autoloop*.py
+enrich*.py
+ngrok.log
+autoloop*.py
