@@ -5,7 +5,11 @@ from models import db, User, Bill, Vote
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'changethislater'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///peoples_chamber.db'
+import os
+DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///peoples_chamber.db')
+if DATABASE_URL.startswith('postgres://'):
+    DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
