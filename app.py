@@ -14,8 +14,10 @@ if 'supabase' in DATABASE_URL and 'sslmode' not in DATABASE_URL:
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
-    'pool_recycle': 300,
-    'connect_args': {'sslmode': 'require'} if 'supabase' in DATABASE_URL else {}
+    'pool_recycle': 60,
+    'pool_size': 2,
+    'max_overflow': 0,
+    'pool_timeout': 10,
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
