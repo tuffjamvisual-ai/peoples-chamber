@@ -1,130 +1,65 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <div class="hero">
     <h1>Peoples Chamber</h1>
     <p>Vote on UK Parliamentary Bills. Make your voice heard.</p>
 </div>
-
-<!-- Search and Filters -->
-<div class="search-filters">
-    <form method="GET" class="filters-form">
-        <div class="search-bar">
-            <input type="text" name="search" placeholder="Search bills..." value="{{ search }}">
-            <button type="submit" class="btn-search">🔍</button>
-        </div>
-        
-        <div class="filter-row">
-            <select name="category">
+<div class="search-box">
+    <form method="GET" action="/">
+        <input type="text" name="search" placeholder="Search bills..." value="{{ search or '' }}">
+        <input type="hidden" name="category" value="{{ category or '' }}">
+        <button type="submit" class="btn">🔍</button>
+    </form>
+    <div class="filters">
+        <form method="GET" action="/">
+            <input type="hidden" name="search" value="{{ search or '' }}">
+            <select name="category" onchange="this.form.submit()">
                 <option value="">All Categories</option>
                 {% for cat in categories %}
-                    <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+                <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
                 {% endfor %}
             </select>
-            
-            <select name="house">
-                <option value="">All Houses</option>
-                {% for h in houses %}
-                    <option value="{{ h }}" {% if house == h %}selected{% endif %}>{{ h }}</option>
-                {% endfor %}
-            </select>
-            
-            <select name="stage">
-                <option value="">All Stages</option>
-                {% for s in stages %}
-                    <option value="{{ s }}" {% if stage == s %}selected{% endif %}>{{ s }}</option>
-                {% endfor %}
-            </select>
-            
-            <button type="submit" class="btn btn-filter">Filter</button>
-            <a href="{{ url_for('index') }}" class="btn btn-clear">Clear</a>
-        </div>
-    </form>
+            <a href="/" class="btn">Clear</a>
+        </form>
+    </div>
 </div>
-
 <div class="bills-grid">
     {% if bills %}
         {% for bill in bills %}
-            {% set total = bill.votes|length %}
-            {% set yes_count = bill.votes|selectattr('choice','equalto','yes')|list|length %}
-            {% set no_count = bill.votes|selectattr('choice','equalto','no')|list|length %}
-            {% if total > 0 %}
-                {% set yes_pct = ((yes_count / total) * 100)|round(1) %}
-                {% set no_pct = ((no_count / total) * 100)|round(1) %}
-            {% else %}
-                {% set yes_pct = 0 %}
-                {% set no_pct = 0 %}
-            {% endif %}
-            
-            <div class="bill-card">
-                <!-- MP Sponsor Info -->
-                {% if bill.sponsor_name %}
-                <div class="sponsor-info">
-                    <div class="sponsor-photo">
-                        {% if bill.sponsor_photo %}
-                            <img src="{{ bill.sponsor_photo }}" alt="{{ bill.sponsor_name }}" onerror="this.src='/static/default-mp.png'">
-                        {% else %}
-                            <div class="photo-placeholder">{{ bill.sponsor_name[:2] }}</div>
-                        {% endif %}
-                    </div>
-                    <div class="sponsor-details">
-                        <div class="sponsor-name">{{ bill.sponsor_name }}</div>
-                        {% if bill.sponsor_party %}
-                            <div class="party-badge" style="background-color: {{ bill.sponsor_party_colour or '#666' }}">{{ bill.sponsor_party }}</div>
-                        {% endif %}
-                        {% if bill.sponsor_constituency %}
-                            <div class="constituency">{{ bill.sponsor_constituency }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
-                
-                <!-- Bill Stage Progress -->
-                {% if bill.current_stage %}
-                <div class="stage-progress">
-                    <div class="stage-tracker">
-                        {% set stages = ['1st reading', '2nd reading', '3rd reading', 'Lords', 'Royal Assent'] %}
-                        {% for stage_name in stages %}
-                            {% if stage_name.lower() in (bill.current_stage or '').lower() %}
-                                {% set is_current = True %}
-                            {% else %}
-                                {% set is_current = False %}
-                            {% endif %}
-                            <div class="stage-dot {% if is_current %}active{% endif %}"></div>
-                        {% endfor %}
-                    </div>
-                    <div class="current-stage">{{ bill.current_stage }}</div>
-                </div>
-                {% endif %}
-                
-                <span class="category">{{ bill.category }}</span>
-                <h2>{{ bill.title }}</h2>
-                
-                <div class="card-bars">
-                    <div class="card-bar-row">
-                        <span class="card-bar-label support">Support</span>
-                        <div class="bar-track">
-                            <div class="bar-fill support" style="width: {{ yes_pct }}%"></div>
-                        </div>
-                        <span class="card-bar-pct">{{ yes_pct }}%</span>
-                    </div>
-                    <div class="card-bar-row">
-                        <span class="card-bar-label oppose">Oppose</span>
-                        <div class="bar-track">
-                            <div class="bar-fill oppose" style="width: {{ no_pct }}%"></div>
-                        </div>
-                        <span class="card-bar-pct">{{ no_pct }}%</span>
-                    </div>
-                </div>
-                
-                <div class="card-footer">
-                    <span class="total-votes">{{ total }} votes</span>
-                    <a href="{{ url_for('bill', bill_id=bill.id) }}" class="btn">View & Vote</a>
+        <div class="bill-card">
+            {% if bill.sponsor_photo %}
+            <div class="card-mp">
+                <img src="{{ bill.sponsor_photo }}" alt="{{ bill.sponsor_name }}" onerror="this.style.display='none'">
+                <div class="card-mp-info">
+                    <strong>{{ bill.sponsor_name }}</strong>
+                    {% if bill.sponsor_party %}
+                    <span class="party-badge" style="background-color: {{ bill.sponsor_party_colour or '#888' }}">{{ bill.sponsor_party }}</span>
+                    {% endif %}
+                    <small>{{ bill.sponsor_constituency }}</small>
                 </div>
             </div>
+            {% endif %}
+            <span class="category">{{ bill.category }}</span>
+            <h2>{{ bill.title }}</h2>
+            <p class="bill-stage">{{ bill.current_stage }}</p>
+            <div class="card-footer">
+                <a href="{{ url_for('bill', bill_id=bill.id) }}" class="btn">View & Vote</a>
+            </div>
+        </div>
         {% endfor %}
     {% else %}
-        <p class="no-bills">No bills found matching your criteria. Try adjusting your search or filters.</p>
+        <p class="no-bills">No bills found. Try adjusting your search or filters.</p>
     {% endif %}
 </div>
+{% if pagination %}
+<div class="pagination">
+    {% if pagination.has_prev %}
+    <a href="?page={{ pagination.prev_num }}&search={{ search or '' }}&category={{ category or '' }}" class="btn">← Previous</a>
+    {% endif %}
+    <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+    {% if pagination.has_next %}
+    <a href="?page={{ pagination.next_num }}&search={{ search or '' }}&category={{ category or '' }}" class="btn">Next →</a>
+    {% endif %}
+</div>
+{% endif %}
 {% endblock %}
