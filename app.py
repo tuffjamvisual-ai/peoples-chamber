@@ -34,6 +34,10 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+# Import and register API routes
+from api_routes import register_api_routes
+register_api_routes(app)
+
 @app.route('/')
 def index():
     search = request.args.get('search', '')
