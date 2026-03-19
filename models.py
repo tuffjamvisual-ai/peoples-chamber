@@ -32,6 +32,13 @@ class Bill(db.Model):
     is_defeated = db.Column(db.Boolean, default=False)
     bill_withdrawn = db.Column(db.String(50), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Cached vote counts - updated periodically instead of counting live
+    vote_count_yes = db.Column(db.Integer, default=0)
+    vote_count_no = db.Column(db.Integer, default=0)
+    vote_count_abstain = db.Column(db.Integer, default=0)
+    vote_counts_updated_at = db.Column(db.DateTime, nullable=True)
+    
     votes = db.relationship('Vote', backref='bill', lazy=True)
 
 class Vote(db.Model):

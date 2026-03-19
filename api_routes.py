@@ -2,6 +2,7 @@ from flask import jsonify, request
 from flask_login import login_required, current_user
 from models import db, Bill, Vote, User
 from sqlalchemy import func
+from datetime import datetime
 
 def register_api_routes(app):
     
@@ -30,25 +31,23 @@ def register_api_routes(app):
         
         bills_data = []
         for bill in pagination.items:
-            yes_count = Vote.query.filter_by(bill_id=bill.id, choice='yes').count()
-            no_count = Vote.query.filter_by(bill_id=bill.id, choice='no').count()
-            abstain_count = Vote.query.filter_by(bill_id=bill.id, choice='abstain').count()
-            
+            # Use cached vote counts - MUCH faster!
             bills_data.append({
                 'id': bill.id,
                 'title': bill.title,
                 'description': bill.description,
                 'category': bill.category,
                 'current_stage': bill.current_stage,
+                'stage_date': bill.stage_date,
                 'sponsor_name': bill.sponsor_name,
                 'sponsor_party': bill.sponsor_party,
                 'sponsor_photo': bill.sponsor_photo,
                 'sponsor_party_colour': bill.sponsor_party_colour,
                 'originating_house': bill.originating_house,
                 'votes': {
-                    'yes': yes_count,
-                    'no': no_count,
-                    'abstain': abstain_count
+                    'yes': bill.vote_count_yes or 0,
+                    'no': bill.vote_count_no or 0,
+                    'abstain': bill.vote_count_abstain or 0
                 }
             })
         
@@ -66,10 +65,6 @@ def register_api_routes(app):
     def api_bill_detail(bill_id):
         """Get single bill with full details and vote counts"""
         bill = Bill.query.get_or_404(bill_id)
-        
-        yes_count = Vote.query.filter_by(bill_id=bill.id, choice='yes').count()
-        no_count = Vote.query.filter_by(bill_id=bill.id, choice='no').count()
-        abstain_count = Vote.query.filter_by(bill_id=bill.id, choice='abstain').count()
         
         user_vote = None
         if current_user.is_authenticated:
@@ -93,9 +88,9 @@ def register_api_routes(app):
             'sponsor_constituency': bill.sponsor_constituency,
             'originating_house': bill.originating_house,
             'votes': {
-                'yes': yes_count,
-                'no': no_count,
-                'abstain': abstain_count
+                'yes': bill.vote_count_yes or 0,
+                'no': bill.vote_count_no or 0,
+                'abstain': bill.vote_count_abstain or 0
             },
             'user_vote': user_vote
         })
@@ -146,13 +141,10 @@ def register_api_routes(app):
         total_abstain = 0
         
         for bill in bills:
-            yes_count = Vote.query.filter_by(bill_id=bill.id, choice='yes').count()
-            no_count = Vote.query.filter_by(bill_id=bill.id, choice='no').count()
-            abstain_count = Vote.query.filter_by(bill_id=bill.id, choice='abstain').count()
-            
-            total_yes += yes_count
-            total_no += no_count
-            total_abstain += abstain_count
+            # Use cached counts
+            total_yes += bill.vote_count_yes or 0
+            total_no += bill.vote_count_no or 0
+            total_abstain += bill.vote_count_abstain or 0
             
             bills_data.append({
                 'id': bill.id,
@@ -160,9 +152,9 @@ def register_api_routes(app):
                 'category': bill.category,
                 'current_stage': bill.current_stage,
                 'votes': {
-                    'yes': yes_count,
-                    'no': no_count,
-                    'abstain': abstain_count
+                    'yes': bill.vote_count_yes or 0,
+                    'no': bill.vote_count_no or 0,
+                    'abstain': bill.vote_count_abstain or 0
                 }
             })
         
@@ -195,24 +187,38 @@ def register_api_routes(app):
         
         existing = Vote.query.filter_by(user_id=current_user.id, bill_id=bill_id).first()
         if existing:
+            # Update cached count - subtract old vote
+            if existing.choice == 'yes':
+                bill.vote_count_yes = max(0, (bill.vote_count_yes or 0) - 1)
+            elif existing.choice == 'no':
+                bill.vote_count_no = max(0, (bill.vote_count_no or 0) - 1)
+            elif existing.choice == 'abstain':
+                bill.vote_count_abstain = max(0, (bill.vote_count_abstain or 0) - 1)
+            
             existing.choice = choice
         else:
             vote = Vote(user_id=current_user.id, bill_id=bill_id, choice=choice)
             db.session.add(vote)
         
-        db.session.commit()
+        # Update cached count - add new vote
+        if choice == 'yes':
+            bill.vote_count_yes = (bill.vote_count_yes or 0) + 1
+        elif choice == 'no':
+            bill.vote_count_no = (bill.vote_count_no or 0) + 1
+        elif choice == 'abstain':
+            bill.vote_count_abstain = (bill.vote_count_abstain or 0) + 1
         
-        yes_count = Vote.query.filter_by(bill_id=bill_id, choice='yes').count()
-        no_count = Vote.query.filter_by(bill_id=bill_id, choice='no').count()
-        abstain_count = Vote.query.filter_by(bill_id=bill_id, choice='abstain').count()
+        bill.vote_counts_updated_at = datetime.utcnow()
+        
+        db.session.commit()
         
         return jsonify({
             'success': True,
             'choice': choice,
             'votes': {
-                'yes': yes_count,
-                'no': no_count,
-                'abstain': abstain_count
+                'yes': bill.vote_count_yes or 0,
+                'no': bill.vote_count_no or 0,
+                'abstain': bill.vote_count_abstain or 0
             }
         })
     
