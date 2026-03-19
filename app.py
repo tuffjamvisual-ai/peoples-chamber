@@ -9,7 +9,14 @@ import os
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///peoples_chamber.db')
 if DATABASE_URL.startswith('postgres://'):
     DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+if 'supabase' in DATABASE_URL and 'sslmode' not in DATABASE_URL:
+    DATABASE_URL += '?sslmode=require'
 app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+    'connect_args': {'sslmode': 'require'} if 'supabase' in DATABASE_URL else {}
+}
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
