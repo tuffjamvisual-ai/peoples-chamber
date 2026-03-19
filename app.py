@@ -1,5 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, request, flash, jsonify
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Bill, Vote
 
@@ -20,6 +21,9 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_timeout': 10,
 }
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Enable CORS for all routes
+CORS(app)
 
 db.init_app(app)
 
